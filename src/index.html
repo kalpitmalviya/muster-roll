@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- <meta charset="utf-8">
+  <title>MusterRoll</title> -->
+  <base href="/">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body style="margin: 0;">
+  <div style="width: 100vw; height: 100vh" id="mapContainer"></div>
+    <script>
+      // Initialize the platform object:
+      var platform = new H.service.Platform({
+        'apikey': 'bGmas9vnCgOxyJrcwXanNmgSucqzL-0IB2OZY_6C9CI'
+      });
+
+      // Obtain the default map types from the platform object
+      var maptypes = platform.createDefaultLayers();
+
+      // Instantiate (and display) a map object:
+      var map = new H.Map(
+        document.getElementById('mapContainer'),
+        maptypes.vector.normal.map,
+        {
+          zoom: 10,
+          center: { lat: 24.588091, lng: 73.723463 }
+        });
+      
+      // Enable the event system on the map instance:
+      var mapEvents = new H.mapevents.MapEvents(map);
+      
+      // Instantiate the default behaviour, providing the mapEvents object:
+      var behavior = new H.mapevents.Behavior(mapEvents);
+
+      // Create a marker icon from an image URL:
+      var icon = new H.map.Icon('assets/marker1.png');
+
+      // Create a marker using the previously instantiated icon:
+      var marker = new H.map.Marker({ lat: 24.622000, lng: 73.70798 }, { icon: icon });
+
+      // Add the marker to the map:
+      map.addObject(marker);
+
+      /*// For Rectangle
+      // Create a style object:
+      var customStyle = {
+        strokeColor: 'green',
+        fillColor: 'rgba(0, 255, 0, 0.2)',
+        lineWidth: 2,
+        lineCap: 'square',
+        lineJoin: 'bevel'
+      };
+
+      // Create a rectangle and pass the custom style as an options parameter:
+      var rect = new H.map.Rect(new H.geo.Rect(24.588127, 73.723375, 24.588044, 73.723548), 
+        { style: customStyle });
+
+      // Add the rectangle to the map:
+      map.addObject(rect);
+      
+      // Zoom the map to fit the rectangle:
+      map.getViewModel().setLookAtData({bounds: rect.getBoundingBox()}); */
+
+      /*// For Circle
+      // Instantiate a circle object (using the default style):
+      var circle = new H.map.Circle({lat: 24.622000, lng: 73.70798}, 5);
+
+      // Add the circle to the map:
+      map.addObject(circle);
+
+      // Zoom the map to fit the circle:
+      map.getViewModel().setLookAtData({bounds: circle.getBoundingBox()});
+
+      var geometry = circle.getGeometry();
+      var wkt = geometry.toString();
+      console.log(wkt);
+      var zip = new JSZip();
+      zip.file("data.wkt", "NAME\tWKT\n" + "testfence" + "\t" + wkt);
+      zip.generateAsync({ type: "blob"}).then(content => {
+        var formData = new FormData();
+        formData.append("zipfile", content);
+        axios.post("https://gfe.api.here.com/2/layers/upload.json", formData, {
+          headers: {
+            "content-type": "multipart/form-data"
+          },
+          params: {
+            "apikey": "bGmas9vnCgOxyJrcwXanNmgSucqzL-0IB2OZY_6C9CI",
+            "layer_id": "5678"
+          }
+        }).then(result => {
+          console.log(result);
+        }, error => {
+          console.error(error);
+        })
+      }, error => {
+        console.error(error);
+      });*/
+
+      // For Polygon
+      // Define points to represent the vertices of a Geofence:
+      var points = [
+        { lat: 24.588160, lng: 73.723510 },
+        { lat: 24.588044, lng: 73.723530 },
+        { lat: 24.588024, lng: 73.723340 },
+        { lat: 24.588145, lng: 73.723330 },
+        { lat: 24.588160, lng: 73.723510 }
+      ];
+      var points2 = [
+      { lat: 24.618700, lng: 73.853500},
+      { lat: 24.620700, lng: 73.852650},
+      { lat: 24.621150, lng: 73.854360},
+      { lat: 24.622122, lng: 73.855828},
+      { lat: 24.618944, lng: 73.857226},
+      { lat: 24.618292, lng: 73.855700},
+      { lat: 24.618700, lng: 73.853500}
+      ];
+
+      // Initialize a linestring and add all the points to it:
+      var linestring = new H.geo.LineString();
+      points2.forEach(function(point) {
+        linestring.pushPoint(point);
+      });
+
+      // Initialize a polyline with the linestring:
+      var polygon = new H.map.Polygon(linestring);
+
+      // Add the polygon to the map:
+      map.addObject(polygon);
+
+      // Zoom the map to fit the polygon:
+      map.getViewModel().setLookAtData({bounds: polygon.getBoundingBox()});
+
+      var geometry = polygon.getGeometry();
+      var wkt = geometry.toString();
+      console.log(wkt);
+      var zip = new JSZip();
+      zip.file("data.wkt", "NAME\tWKT\n" + "testfence" + "\t" + wkt);
+      zip.generateAsync({ type: "blob"}).then(content => {
+        var formData = new FormData();
+        formData.append("zipfile", content);
+        axios.post("https://fleet.ls.hereapi.com/2/layers/upload.json", formData, {
+          headers: {
+            "content-type": "multipart/form-data"
+          },
+          params: {
+            "apikey": "bGmas9vnCgOxyJrcwXanNmgSucqzL-0IB2OZY_6C9CI",
+            "layer_id": "1234"
+          }
+        }).then(result => {
+          console.log(result);
+        }, error => {
+          console.error(error);
+        })
+      }, error => {
+        console.error(error);
+      });
+
+      // Search for geo fence geometries within a given radius around the asset position
+      var service = platform.getGeofencingService();
+      // Add event listeners:
+      map.addEventListener('tap', function(evt) {
+        var target = evt.target;
+        map.removeObject(marker);
+        marker = new H.map.Marker(map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY), { icon: icon});
+        map.addObject(marker);
+        // Log 'tap' and 'mouse' events:
+        //console.log(evt.type, evt.currentPointer.type);
+        service.request(
+          H.service.extension.geofencing.Service.EntryPoint.SEARCH_PROXIMITY,
+          {
+            'layer_ids': ['1234'],
+            'proximity': marker.getPosition().lat + "," + marker.getPosition().lng,
+            'key_attributes': ['NAME']
+          },
+          result => {
+            if(result.geometries.length > 0){
+              alert("Witnin the Geofence!");
+              console.log(result);
+            }
+            else{
+              alert("Outside the Geofence!");
+              console.log(result);
+            }
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      });      
+
+    </script>
+  <app-root></app-root>
+</body>
+</html>
